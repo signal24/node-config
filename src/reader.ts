@@ -49,8 +49,7 @@ export function transformContent(content: string, transform: (data: ConfigData) 
             if (line.raw !== undefined) {
                 return line.raw;
             }
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            return `${line.key}=${transformed[line.key!]}`;
+            return `${line.key}=${transformed[line.key]}`;
         })
         .join('\n');
     return newContent;
