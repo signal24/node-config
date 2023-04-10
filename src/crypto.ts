@@ -1,4 +1,14 @@
-import { createCipheriv, createDecipheriv, createPrivateKey, createPublicKey, KeyObject, privateDecrypt, publicEncrypt, randomBytes, constants } from 'crypto';
+import {
+    constants,
+    createCipheriv,
+    createDecipheriv,
+    createPrivateKey,
+    createPublicKey,
+    KeyObject,
+    privateDecrypt,
+    publicEncrypt,
+    randomBytes
+} from 'crypto';
 
 export class Encryptor {
     private publicKey: KeyObject;
@@ -13,10 +23,13 @@ export class Encryptor {
 
     encryptValue(value: string) {
         const key = randomBytes(32);
-        const encryptedKey = publicEncrypt({
-            key: this.publicKey,
-            padding: constants.RSA_PKCS1_OAEP_PADDING
-        }, key);
+        const encryptedKey = publicEncrypt(
+            {
+                key: this.publicKey,
+                padding: constants.RSA_PKCS1_OAEP_PADDING
+            },
+            key
+        );
 
         const iv = randomBytes(16);
         const cipher = createCipheriv('aes-256-cbc', key, iv);
@@ -64,10 +77,13 @@ export class Decryptor {
         const iv = buffer.subarray(257, 273);
         const encryptedValue = buffer.subarray(273);
 
-        const decryptedKey = privateDecrypt({
-            key: this.privateKey,
-            padding: constants.RSA_PKCS1_OAEP_PADDING
-        }, encryptedKey);
+        const decryptedKey = privateDecrypt(
+            {
+                key: this.privateKey,
+                padding: constants.RSA_PKCS1_OAEP_PADDING
+            },
+            encryptedKey
+        );
         const decipher = createDecipheriv('aes-256-cbc', decryptedKey, iv);
         const decryptedValue = Buffer.concat([decipher.update(encryptedValue), decipher.final()]);
         return decryptedValue.toString();

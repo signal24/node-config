@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { parse } from 'path';
+
 import { ConfigData } from './types';
 
 export function readConfigFile<T extends Record<string, string>>(path: string): T {
@@ -35,16 +36,22 @@ export function transformContent(content: string, transform: (data: ConfigData) 
         const [, key, value] = matches;
         return { key, value };
     });
-    const config = lines.filter(line => line.key).reduce((config, line) => {
-        config[line.key!] = line.value!;
-        return config;
-    }, {} as ConfigData);
+    const config = lines
+        .filter(line => line.key)
+        .reduce((config, line) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            config[line.key!] = line.value!;
+            return config;
+        }, {} as ConfigData);
     const transformed = transform(config);
-    const newContent = lines.map(line => {
-        if (line.raw !== undefined) {
-            return line.raw;
-        }
-        return `${line.key}=${transformed[line.key!]}`;
-    }).join('\n');
+    const newContent = lines
+        .map(line => {
+            if (line.raw !== undefined) {
+                return line.raw;
+            }
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            return `${line.key}=${transformed[line.key!]}`;
+        })
+        .join('\n');
     return newContent;
 }

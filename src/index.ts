@@ -1,5 +1,6 @@
 import { parse } from 'dotenv';
 import { existsSync } from 'fs';
+
 import { Decryptor } from './crypto';
 import { loadAndTransformContent } from './reader';
 import { ConfigData, DefaultLoadOptions, LoadOptions } from './types';
@@ -14,7 +15,7 @@ export function decryptConfig(decryptor: Decryptor, data: ConfigData): ConfigDat
 
 export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
     options = { ...DefaultLoadOptions, ...options };
-    const files = Array.isArray(options.file) ? options.file : [options.file] as string[];
+    const files = Array.isArray(options.file) ? options.file : ([options.file] as string[]);
 
     if (!options.key) {
         throw new Error('Decryption key is not set');
