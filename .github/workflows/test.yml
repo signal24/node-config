@@ -14,7 +14,8 @@ jobs:
         with:
           node-version: 18
       - run: yarn --frozen-lockfile
-      - run: yarn test
+      - run: yarn test --collectCoverage=true
       - run: yarn format
       - run: git diff --exit-code
       - run: yarn build
+      - uses: codecov/codecov-action@v3
