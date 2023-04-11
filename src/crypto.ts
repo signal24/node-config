@@ -54,17 +54,23 @@ export class Encryptor {
 }
 
 export class Decryptor {
-    private privateKey: KeyObject;
+    private privateKey?: KeyObject;
 
-    constructor(privateKey: string) {
-        this.privateKey = createPrivateKey({
-            key: Buffer.from(privateKey, 'base64'),
-            format: 'der',
-            type: 'pkcs8'
-        });
+    constructor(privateKey?: string) {
+        if (privateKey) {
+            this.privateKey = createPrivateKey({
+                key: Buffer.from(privateKey, 'base64'),
+                format: 'der',
+                type: 'pkcs8'
+            });
+        }
     }
 
     decryptValue(value: string) {
+        if (!this.privateKey) {
+            throw new Error('No decryption key was provided');
+        }
+
         value = value.substring(3, value.length - 1);
         const buffer = Buffer.from(value, 'base64');
 

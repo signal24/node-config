@@ -17,10 +17,6 @@ export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
     options = { ...DefaultLoadOptions, ...options };
     const files = Array.isArray(options.file) ? options.file : ([options.file] as string[]);
 
-    if (!options.key) {
-        throw new Error('Decryption key is not set');
-    }
-
     const decryptor = new Decryptor(options.key);
 
     const config: ConfigData = {};

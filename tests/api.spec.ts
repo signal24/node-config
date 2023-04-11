@@ -17,4 +17,26 @@ describe('API', () => {
             VAR_5_SECRET: 'supercalifragilisticexpialidocious'
         });
     });
+
+    it('should load a config with no encryption', async () => {
+        const config = loadConfig({
+            file: `${__dirname}/fixtures/sample.env`
+        });
+
+        expect(config).toMatchObject({
+            VAR_1: 'a',
+            VAR_2: 'b',
+            VAR_3_SECRET: 'the quick brown fox jumps over the lazy dog',
+            VAR_4: 'VAR_4_OVERRIDE',
+            VAR_5_SECRET: 'supercalifragilisticexpialidocious'
+        });
+    });
+
+    it('should throw if the config is encrypted and no key is provided', async () => {
+        expect(() => {
+            loadConfig({
+                file: `${__dirname}/fixtures/sample.enc.env`
+            });
+        }).toThrow('No decryption key was provided');
+    });
 });
