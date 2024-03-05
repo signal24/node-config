@@ -82,7 +82,7 @@ describe('CLI', () => {
         const beforeContent = readFileSync(`${__dirname}/fixtures/cli.env.test`, 'utf8');
 
         const { privateKey, publicKey } = generateConfigKeyPair();
-        const beforeContentWithKey = `__CONFIG_ENCRYPTION_KEY__=${publicKey}\n\n${beforeContent}`;
+        const beforeContentWithKey = `CONFIG_ENCRYPTION_KEY=${publicKey}\n\n${beforeContent}`;
         writeFileSync(`${__dirname}/fixtures/cli.env.test`, beforeContentWithKey, 'utf8');
 
         program.parse(['encrypt', `${__dirname}/fixtures/cli.env.test`], { from: 'user' });

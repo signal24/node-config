@@ -22,7 +22,7 @@ program
 
         for (const file of files) {
             transformFile(file, data => {
-                const fileKey = key ?? data.__CONFIG_ENCRYPTION_KEY__;
+                const fileKey = key ?? data.CONFIG_ENCRYPTION_KEY ?? data.__CONFIG_ENCRYPTION_KEY__;
                 if (!fileKey) {
                     throw new Error(`No encryption key specified for ${file}`);
                 }
