@@ -6,6 +6,7 @@ COPY src ./src
 
 RUN yarn && \
     yarn build && \
+    yarn install --production && \
     yarn cache clean && \
     ln -s /app/dist/cli.js /usr/bin/config-cli
 
