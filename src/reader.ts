@@ -1,11 +1,7 @@
 import { readFileSync } from 'fs';
-import { parse } from 'path';
 
+import { getPath } from './helpers';
 import { ConfigData } from './types';
-
-export function readConfigFile<T extends Record<string, string>>(path: string): T {
-    return parse(readFileSync(path, 'utf8')) as any;
-}
 
 type MatchType = string | RegExp;
 export function keyMatches(key: string, match: MatchType | MatchType[]): boolean {
@@ -20,7 +16,7 @@ export function keyMatches(key: string, match: MatchType | MatchType[]): boolean
 }
 
 export function loadAndTransformContent(path: string, transform: (data: ConfigData) => ConfigData) {
-    const content = readFileSync(path, 'utf8').replace(/\r\n/, '\n');
+    const content = readFileSync(getPath(path), 'utf8').replace(/\r\n/, '\n');
     return transformContent(content, transform);
 }
 

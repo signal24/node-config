@@ -1,8 +1,8 @@
 import { Command } from 'commander';
-import { existsSync, writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 
 import { Decryptor, Encryptor } from './crypto';
-import { generateConfigKeyPair } from './helpers';
+import { fileExists, generateConfigKeyPair } from './helpers';
 import { keyMatches, loadAndTransformContent } from './reader';
 import { ConfigData } from './types';
 
@@ -97,7 +97,7 @@ program
 
 function verifyFiles(files: string[]) {
     return files.filter(file => {
-        if (!existsSync(file)) {
+        if (!fileExists(file)) {
             process.stderr.write(`'${file}' does not exist\n`);
             return false;
         }
@@ -115,7 +115,7 @@ function exportFiles(files: string[], key: string) {
     const decryptor = new Decryptor(key);
 
     for (const file of files) {
-        if (existsSync(file)) {
+        if (fileExists(file)) {
             loadAndTransformContent(file, data => {
                 for (const [key, value] of Object.entries(data)) {
                     result[key] = decryptor.decryptValueIfEncrypted(value);

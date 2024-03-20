@@ -1,7 +1,7 @@
 import { parse } from 'dotenv';
-import { existsSync } from 'fs';
 
 import { Decryptor } from './crypto';
+import { fileExists } from './helpers';
 import { loadAndTransformContent } from './reader';
 import { ConfigData, DefaultLoadOptions, LoadOptions } from './types';
 
@@ -27,7 +27,7 @@ export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
 
     const config: ConfigData = {};
     for (const file of files) {
-        if (existsSync(file)) {
+        if (fileExists(file)) {
             const decryptedContent = loadAndTransformContent(file, data => decryptConfig(decryptor, data));
             const fileConfig = parse(decryptedContent);
             Object.assign(config, fileConfig);
