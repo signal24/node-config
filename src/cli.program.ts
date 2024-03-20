@@ -9,6 +9,28 @@ import { ConfigData } from './types';
 export const program = new Command();
 
 program
+    .command('sh [files...]')
+    .description('Output export statements to set variables from the specified .env files')
+    .option('-k, --key <key>', 'The decryption key (defaults to the value of the CONFIG_DECRYPTION_KEY environment variable)')
+    .action((files, options) => {
+        files = files.length ? files : ['.env'];
+        files = verifyFiles(files);
+
+        const key = options.key ?? process.env.CONFIG_DECRYPTION_KEY;
+        exportFiles(files, key);
+    });
+
+program
+    .command('shenv [environment]')
+    .description('Output export statements to set variables from the specified environment')
+    .option('-k, --key <key>', 'The decryption key (defaults to the value of the CONFIG_DECRYPTION_KEY environment variable)')
+    .action((env, options) => {
+        const files = ['.env', '.env.local', `.env.${env}`, `.env.${env}.local`];
+        const key = options.key ?? process.env.CONFIG_DECRYPTION_KEY;
+        exportFiles(files, key);
+    });
+
+program
     .command('encrypt [files...]')
     .description('Encrypts the specified .env files')
     .option('-k, --key <key>', 'The encryption key (defaults to the value of the CONFIG_ENCRYPTION_KEY environment variable)')
@@ -86,4 +108,26 @@ function verifyFiles(files: string[]) {
 function transformFile(path: string, transform: (data: ConfigData) => ConfigData) {
     const updatedContent = loadAndTransformContent(path, transform);
     writeFileSync(path, updatedContent);
+}
+
+function exportFiles(files: string[], key: string) {
+    const result: ConfigData = {};
+    const decryptor = new Decryptor(key);
+
+    for (const file of files) {
+        if (existsSync(file)) {
+            loadAndTransformContent(file, data => {
+                for (const [key, value] of Object.entries(data)) {
+                    result[key] = decryptor.decryptValueIfEncrypted(value);
+                }
+                return data;
+            });
+        }
+    }
+
+    for (const [key, value] of Object.entries(result)) {
+        if (!process.env[key]) {
+            console.log(`export ${key}="${value}"`);
+        }
+    }
 }

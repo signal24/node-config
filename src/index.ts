@@ -15,6 +15,12 @@ export function decryptConfig(decryptor: Decryptor, data: ConfigData): ConfigDat
 
 export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
     options = { ...DefaultLoadOptions, ...options };
+
+    if (!options.file) {
+        const envFiles = options.env ? [`.env.${options.env}`, `.env.${options.env}.local`] : [];
+        options.file = ['.env', '.env.local', ...envFiles];
+    }
+
     const files = Array.isArray(options.file) ? options.file : ([options.file] as string[]);
 
     const decryptor = new Decryptor(options.key);

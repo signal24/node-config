@@ -6,6 +6,7 @@ export interface DecryptOptions {
 
 export interface LoadOptions extends DecryptOptions {
     file?: string | string[];
+    env?: string;
 }
 
 export interface EncryptOptions {
@@ -14,7 +15,6 @@ export interface EncryptOptions {
 }
 
 export const DefaultLoadOptions: Partial<LoadOptions> = {
-    file: '.env',
     key: process.env.CONFIG_DECRYPTION_KEY
 };
 
