@@ -89,8 +89,8 @@ program
     .description('Generate a public/private key pair for encryption')
     .action(() => {
         const { privateKey, publicKey } = generateConfigKeyPair();
-        console.log(`CONFIG_ENCRYPTION_KEY=${publicKey}`);
-        console.log(`CONFIG_DECRYPTION_KEY=${privateKey}`);
+        console.log(`CONFIG_ENCRYPTION_KEY=${publicKey}\n`);
+        console.log(`CONFIG_DECRYPTION_KEY=${privateKey}\n`);
     });
 
 // helpers

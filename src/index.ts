@@ -5,7 +5,17 @@ import { fileExists } from './helpers';
 import { readContentFromFile, transformContent } from './reader';
 import { ConfigData, DefaultLoadOptions, LoadOptions } from './types';
 
-export function decryptConfigData(decryptor: Decryptor, data: ConfigData): ConfigData {
+export function encryptConfigData(encryptorOrKey: Encryptor | string, data: ConfigData): ConfigData {
+    const encryptor = encryptorOrKey instanceof Encryptor ? encryptorOrKey : new Encryptor(encryptorOrKey);
+    const encrypted: ConfigData = {};
+    for (const [key, value] of Object.entries(data)) {
+        encrypted[key] = encryptor.encryptValueIfNotEncrypted(value);
+    }
+    return encrypted;
+}
+
+export function decryptConfigData(decryptorOrKey: Decryptor | string, data: ConfigData): ConfigData {
+    const decryptor = decryptorOrKey instanceof Decryptor ? decryptorOrKey : new Decryptor(decryptorOrKey);
     const decrypted: ConfigData = {};
     for (const [key, value] of Object.entries(data)) {
         decrypted[key] = decryptor.decryptValueIfEncrypted(value);
@@ -22,6 +32,8 @@ export function parseEnvContent<T extends ConfigData>(content: string, decryptor
 
 export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
     options = { ...DefaultLoadOptions, ...options };
+
+    delete process.env.CONFIG_DECRYPTION_KEY;
 
     if (!options.file) {
         const envFiles = options.env ? [`.env.${options.env}`, `.env.${options.env}.local`] : [];
@@ -41,9 +53,16 @@ export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
         }
     }
 
-    Object.assign(config, process.env);
+    if (options.mergeProcessEnv !== false) {
+        Object.assign(config, process.env);
+    }
 
     return config as T;
+}
+
+export function loadConfigIntoEnv(options?: LoadOptions): void {
+    const resolved = loadConfig(options);
+    Object.assign(process.env, resolved);
 }
 
 export { Decryptor, Encryptor };
