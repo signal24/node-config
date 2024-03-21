@@ -1,6 +1,6 @@
 import { parse } from 'dotenv';
 
-import { Decryptor } from './crypto';
+import { Decryptor, Encryptor } from './crypto';
 import { fileExists } from './helpers';
 import { readContentFromFile, transformContent } from './reader';
 import { ConfigData, DefaultLoadOptions, LoadOptions } from './types';
@@ -44,3 +44,5 @@ export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
 
     return config as T;
 }
+
+export { Decryptor, Encryptor };
