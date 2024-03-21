@@ -13,7 +13,8 @@ export function decryptConfigData(decryptor: Decryptor, data: ConfigData): Confi
     return decrypted;
 }
 
-export function parseEnvContent<T extends ConfigData>(content: string, decryptor: Decryptor = new Decryptor()): T {
+export function parseEnvContent<T extends ConfigData>(content: string, decryptorOrKey?: Decryptor | string): T {
+    const decryptor = decryptorOrKey instanceof Decryptor ? decryptorOrKey : new Decryptor(decryptorOrKey);
     const decryptedContent = transformContent(content, data => decryptConfigData(decryptor, data));
     const config = parse(decryptedContent);
     return config as T;
