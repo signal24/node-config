@@ -15,9 +15,8 @@ export function keyMatches(key: string, match: MatchType | MatchType[]): boolean
     return match.test(key);
 }
 
-export function loadAndTransformContent(path: string, transform: (data: ConfigData) => ConfigData) {
-    const content = readFileSync(getPath(path), 'utf8').replace(/\r\n/, '\n');
-    return transformContent(content, transform);
+export function readContentFromFile(path: string) {
+    return readFileSync(getPath(path), 'utf8').replace(/\r\n/, '\n');
 }
 
 export function transformContent(content: string, transform: (data: ConfigData) => ConfigData) {

@@ -3,7 +3,7 @@ import { writeFileSync } from 'fs';
 
 import { Decryptor, Encryptor } from './crypto';
 import { fileExists, generateConfigKeyPair } from './helpers';
-import { keyMatches, loadAndTransformContent } from './reader';
+import { keyMatches, readContentFromFile, transformContent } from './reader';
 import { ConfigData } from './types';
 
 export const program = new Command();
@@ -106,7 +106,8 @@ function verifyFiles(files: string[]) {
 }
 
 function transformFile(path: string, transform: (data: ConfigData) => ConfigData) {
-    const updatedContent = loadAndTransformContent(path, transform);
+    const originalContent = readContentFromFile(path);
+    const updatedContent = transformContent(originalContent, transform);
     writeFileSync(path, updatedContent);
 }
 
@@ -116,7 +117,8 @@ function exportFiles(files: string[], key: string) {
 
     for (const file of files) {
         if (fileExists(file)) {
-            loadAndTransformContent(file, data => {
+            const originalContent = readContentFromFile(file);
+            transformContent(originalContent, data => {
                 for (const [key, value] of Object.entries(data)) {
                     result[key] = decryptor.decryptValueIfEncrypted(value);
                 }

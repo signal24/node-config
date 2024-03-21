@@ -7,6 +7,7 @@ export interface DecryptOptions {
 export interface LoadOptions extends DecryptOptions {
     file?: string | string[];
     env?: string;
+    mergeProcessEnv?: boolean;
 }
 
 export interface EncryptOptions {

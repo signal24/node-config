@@ -2,15 +2,21 @@ import { parse } from 'dotenv';
 
 import { Decryptor } from './crypto';
 import { fileExists } from './helpers';
-import { loadAndTransformContent } from './reader';
+import { readContentFromFile, transformContent } from './reader';
 import { ConfigData, DefaultLoadOptions, LoadOptions } from './types';
 
-export function decryptConfig(decryptor: Decryptor, data: ConfigData): ConfigData {
+export function decryptConfigData(decryptor: Decryptor, data: ConfigData): ConfigData {
     const decrypted: ConfigData = {};
     for (const [key, value] of Object.entries(data)) {
         decrypted[key] = decryptor.decryptValueIfEncrypted(value);
     }
     return decrypted;
+}
+
+export function parseEnvContent<T extends ConfigData>(content: string, decryptor: Decryptor = new Decryptor()): T {
+    const decryptedContent = transformContent(content, data => decryptConfigData(decryptor, data));
+    const config = parse(decryptedContent);
+    return config as T;
 }
 
 export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
@@ -28,8 +34,8 @@ export function loadConfig<T extends ConfigData>(options?: LoadOptions): T {
     const config: ConfigData = {};
     for (const file of files) {
         if (fileExists(file)) {
-            const decryptedContent = loadAndTransformContent(file, data => decryptConfig(decryptor, data));
-            const fileConfig = parse(decryptedContent);
+            const encryptedContent = readContentFromFile(file);
+            const fileConfig = parseEnvContent(encryptedContent, decryptor);
             Object.assign(config, fileConfig);
         }
     }
