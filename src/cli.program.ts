@@ -52,7 +52,9 @@ program
                 const encryptor = new Encryptor(fileKey);
                 for (const key of Object.keys(data)) {
                     if (keyMatches(key, encryptKeys)) {
-                        data[key] = encryptor.encryptValueIfNotEncrypted(data[key]);
+                        if (data[key].length) {
+                            data[key] = encryptor.encryptValueIfNotEncrypted(data[key]);
+                        }
                     }
                 }
                 return data;
