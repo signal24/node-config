@@ -95,6 +95,52 @@ program
         console.log(`CONFIG_DECRYPTION_KEY=${privateKey}\n`);
     });
 
+program
+    .command('verify [files...]')
+    .description('Verifies that all secrets are encrypted correctly in a given .env file')
+    .option('-k, --key <key>', 'The decryption key (defaults to the value of the CONFIG_DECRYPTION_KEY environment variable)')
+    .action((files, options) => {
+        files = files.length ? files : ['.env'];
+        files = verifyFiles(files);
+
+        let numErrors = 0;
+        const key = options.key ?? process.env.CONFIG_DECRYPTION_KEY;
+        const decryptor = new Decryptor(key);
+
+        for (const file of files) {
+            let numFileErrors = 0;
+
+            transformFile(file, data => {
+                for (const key of Object.keys(data)) {
+                    if (key.endsWith('_SECRET') && !Decryptor.isValueEncrypted(data[key])) {
+                        console.error(`${file}: ${key} is not encrypted`);
+                        numFileErrors++;
+                    } else if (Decryptor.isValueEncrypted(data[key])) {
+                        try {
+                            decryptor.decryptValue(data[key]);
+                        } catch (err) {
+                            console.error(`${file}: ${key} is encrypted but cannot be decrypted`);
+                            numFileErrors++;
+                        }
+                    }
+                }
+
+                return data;
+            });
+
+            if (numFileErrors === 0) {
+                console.log(`✅ ${file}`);
+            } else {
+                console.error(`❌ ${file}: ${numFileErrors} errors found`);
+                numErrors += numFileErrors;
+            }
+        }
+
+        if (numErrors > 0) {
+            process.exit(1);
+        }
+    });
+
 // helpers
 
 function verifyFiles(files: string[]) {
