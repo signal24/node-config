@@ -154,6 +154,14 @@ npx config-cli decrypt -k "LONG_DECRYPTION_KEY" .env
 docker run --rm -it -v `pwd`:/src -w /src ghcr.io/signal24/node-config decrypt -k "LONG_DECRYPTION_KEY" .env
 ```
 
+## Verify encrypted secrets on pre-commit
+
+Setup a pre-commit hook to ensure that you don't commit secrets:
+
+```
+npx config-cli verify .env
+```
+
 ## Other APIs
 
 -   `parseEnvContent(rawDotenvContent: string, decryptionKey?: string): Record<string, string>`

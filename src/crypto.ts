@@ -66,6 +66,10 @@ export class Decryptor {
         }
     }
 
+    static isValueEncrypted(value: string) {
+        return value.startsWith('$$[') && value.endsWith(']');
+    }
+
     decryptValue(value: string) {
         if (!this.privateKey) {
             throw new Error('No decryption key was provided');
@@ -95,8 +99,18 @@ export class Decryptor {
         return decryptedValue.toString();
     }
 
+    tryDecryptValue(value: string) {
+        try {
+            this.decryptValue(value);
+        } catch (err) {
+            return err;
+        }
+
+        return null;
+    }
+
     decryptValueIfEncrypted(value: string) {
-        if (value.startsWith('$$[') && value.endsWith(']')) {
+        if (Decryptor.isValueEncrypted(value)) {
             return this.decryptValue(value);
         }
         return value;

@@ -95,6 +95,64 @@ program
         console.log(`CONFIG_DECRYPTION_KEY=${privateKey}\n`);
     });
 
+program
+    .command('verify [files...]')
+    .description('Verifies that all secrets are encrypted correctly in a given .env file')
+    .option('-k, --key <key>', 'The decryption key (defaults to the value of the CONFIG_DECRYPTION_KEY environment variable)')
+    .action((files, options) => {
+        files = files.length ? files : ['.env'];
+        files = verifyFiles(files);
+
+        let numTotalErrors = 0;
+
+        const key = options.key ?? process.env.CONFIG_DECRYPTION_KEY;
+        const decryptor = key ? new Decryptor(key) : null;
+
+        if (!decryptor) {
+            console.warn(`⚠️  will not check for encryption errors because no decryption key was provided\n`);
+        }
+
+        for (const file of files) {
+            let numFileErrors = 0;
+
+            transformFile(file, data => {
+                for (const key of Object.keys(data)) {
+                    if (!Decryptor.isValueEncrypted(data[key])) {
+                        if (key.endsWith('_SECRET')) {
+                            console.error(`${file}: ${key} is not encrypted`);
+                            numFileErrors++;
+                        }
+
+                        continue;
+                    }
+
+                    if (!decryptor) {
+                        continue;
+                    }
+
+                    const err = decryptor.tryDecryptValue(data[key]);
+                    if (err) {
+                        console.error(`${file}: is encrypted but cannot be decrypted`);
+                        numFileErrors++;
+                    }
+                }
+
+                return data;
+            });
+
+            if (numFileErrors === 0) {
+                console.log(`✅ ${file}`);
+            } else {
+                console.error(`❌ ${file}: ${numFileErrors} errors found`);
+                numTotalErrors += numFileErrors;
+            }
+        }
+
+        if (numTotalErrors > 0) {
+            process.exit(1);
+        }
+    });
+
 // helpers
 
 function verifyFiles(files: string[]) {
