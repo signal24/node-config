@@ -103,25 +103,37 @@ program
         files = files.length ? files : ['.env'];
         files = verifyFiles(files);
 
-        let numErrors = 0;
+        let numTotalErrors = 0;
+
         const key = options.key ?? process.env.CONFIG_DECRYPTION_KEY;
-        const decryptor = new Decryptor(key);
+        const decryptor = key ? new Decryptor(key) : null;
+
+        if (!decryptor) {
+            console.warn(`⚠️  will not check for encryption errors because no decryption key was provided\n`);
+        }
 
         for (const file of files) {
             let numFileErrors = 0;
 
             transformFile(file, data => {
                 for (const key of Object.keys(data)) {
-                    if (key.endsWith('_SECRET') && !Decryptor.isValueEncrypted(data[key])) {
-                        console.error(`${file}: ${key} is not encrypted`);
-                        numFileErrors++;
-                    } else if (Decryptor.isValueEncrypted(data[key])) {
-                        try {
-                            decryptor.decryptValue(data[key]);
-                        } catch (err) {
-                            console.error(`${file}: ${key} is encrypted but cannot be decrypted`);
+                    if (!Decryptor.isValueEncrypted(data[key])) {
+                        if (key.endsWith('_SECRET')) {
+                            console.error(`${file}: ${key} is not encrypted`);
                             numFileErrors++;
                         }
+
+                        continue;
+                    }
+
+                    if (!decryptor) {
+                        continue;
+                    }
+
+                    const err = decryptor.tryDecryptValue(data[key]);
+                    if (err) {
+                        console.error(`${file}: is encrypted but cannot be decrypted`);
+                        numFileErrors++;
                     }
                 }
 
@@ -132,11 +144,11 @@ program
                 console.log(`✅ ${file}`);
             } else {
                 console.error(`❌ ${file}: ${numFileErrors} errors found`);
-                numErrors += numFileErrors;
+                numTotalErrors += numFileErrors;
             }
         }
 
-        if (numErrors > 0) {
+        if (numTotalErrors > 0) {
             process.exit(1);
         }
     });

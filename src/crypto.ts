@@ -99,6 +99,16 @@ export class Decryptor {
         return decryptedValue.toString();
     }
 
+    tryDecryptValue(value: string) {
+        try {
+            this.decryptValue(value);
+        } catch (err) {
+            return err;
+        }
+
+        return null;
+    }
+
     decryptValueIfEncrypted(value: string) {
         if (Decryptor.isValueEncrypted(value)) {
             return this.decryptValue(value);
