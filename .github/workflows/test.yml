@@ -10,10 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: yarn --frozen-lockfile
+          node-version: 22
+      - run: corepack enable
+      - run: yarn --immutable
       - run: yarn test --collectCoverage=true
       - run: yarn format
       - run: git diff --exit-code

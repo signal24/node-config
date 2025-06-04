@@ -34,7 +34,6 @@ export function transformContent(content: string, transform: (data: ConfigData) 
     const config = lines
         .filter(line => line.key)
         .reduce((config, line) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             config[line.key!] = line.value!;
             return config;
         }, {} as ConfigData);

@@ -6,11 +6,11 @@ TypeScript package for encrypting & decrypting secrets in and loading config fro
 
 A pair of RSA-2048 keys (one public, one private) are generated as your encryption keys. For each secret that needs to be encrypted:
 
--   a random AES-256 key is generated
--   the secret is encrypted with the AES-256 key
--   the key is wrapped with the public RSA key
--   the version number (of the encryption scheme), the encrypted/wrapped key, the AES IV, and the AES-encrypted secret are combined into a single payload
--   the plaintext secret is replaced with the payload, base64-encoded (and a prefix/suffix to indicate that it's an encrypted value)
+- a random AES-256 key is generated
+- the secret is encrypted with the AES-256 key
+- the key is wrapped with the public RSA key
+- the version number (of the encryption scheme), the encrypted/wrapped key, the AES IV, and the AES-encrypted secret are combined into a single payload
+- the plaintext secret is replaced with the payload, base64-encoded (and a prefix/suffix to indicate that it's an encrypted value)
 
 ## Installation
 
@@ -164,9 +164,9 @@ npx config-cli verify .env
 
 ## Other APIs
 
--   `parseEnvContent(rawDotenvContent: string, decryptionKey?: string): Record<string, string>`
-    -   Parses string content (in dotenv format), decrypts (if a key is provided), and returns an object of keys and values.
--   `encryptConfigData(key: string, data: Record<string, string>): Record<string, string>`
-    -   Returns an object of keys and values where the value of any key suffixed with `_SECRET` is encrypted.
--   `decryptConfigData(key: string, data: Record<string, string>): Record<string, string>`
-    -   Returns an object of keys and values, decrypting any value that is encrypted.
+- `parseEnvContent(rawDotenvContent: string, decryptionKey?: string): Record<string, string>`
+    - Parses string content (in dotenv format), decrypts (if a key is provided), and returns an object of keys and values.
+- `encryptConfigData(key: string, data: Record<string, string>): Record<string, string>`
+    - Returns an object of keys and values where the value of any key suffixed with `_SECRET` is encrypted.
+- `decryptConfigData(key: string, data: Record<string, string>): Record<string, string>`
+    - Returns an object of keys and values, decrypting any value that is encrypted.
