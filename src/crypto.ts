@@ -46,6 +46,7 @@ export class Encryptor {
     }
 
     encryptValueIfNotEncrypted(value: string) {
+        if (value.length === 0) return value;
         if (value.startsWith('$$[') && value.endsWith(']')) {
             return value;
         }
