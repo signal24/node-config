@@ -79,7 +79,12 @@ program
         for (const file of files) {
             transformFile(file, data => {
                 for (const key of Object.keys(data)) {
-                    data[key] = decryptor.decryptValueIfEncrypted(data[key]);
+                    try {
+                        data[key] = decryptor.decryptValueIfEncrypted(data[key]);
+                    } catch (err) {
+                        console.error(`${file}: ${key} cannot be decrypted`);
+                        throw err;
+                    }
                 }
                 return data;
             });
@@ -132,7 +137,7 @@ program
 
                     const err = decryptor.tryDecryptValue(data[key]);
                     if (err) {
-                        console.error(`${file}: is encrypted but cannot be decrypted`);
+                        console.error(`${file}: ${key} is encrypted but cannot be decrypted`);
                         numFileErrors++;
                     }
                 }

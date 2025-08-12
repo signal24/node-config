@@ -1,6 +1,6 @@
 {
     "name": "@signal24/config",
-    "version": "1.9.1",
+    "version": "1.9.2",
     "description": "Runtime configuration encryption helpers",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
